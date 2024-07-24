@@ -12,10 +12,19 @@ class ScrapperApi
     @companies = []
   end
 
-
   def scrape_company_data
     current_page = 0
     hits_per_page = 10
+
+    # set company size object
+    if @filters[:company_size].include?("-")
+      company_size = @filters[:company_size].split("-")
+      min_company_size = company_size[0].to_i
+      max_company_size = company_size[1].to_i
+    else
+      min_company_size = 1
+      maximum_company_size = @filters[:company_size].to_i
+    end
 
     while @companies.size < @n
       response = HTTParty.post(
@@ -26,10 +35,18 @@ class ScrapperApi
           'X-Algolia-Application-Id' => ALGOLIA_APP_ID
         },
         body: {
-          query: '',
-          filters: '',
-          page: 1,
-          hitsPerPage: 100
+          facetFilters: build_filters,
+          facetQuery: "",
+          facets: [
+            'app_answers', 'app_video_public', 'batch', 'demo_day_video_public', 'highlight_black',
+            'highlight_latinx', 'highlight_women', 'industries', 'isHiring', 'nonprofit', 'question_answers',
+            'regions', 'subindustry', 'tags', 'top_company'
+          ],
+          hitsPerPage: hits_per_page,
+          maxFacetHits: 100,
+          maxValuesPerFacet: 1000,
+          page: current_page,
+          query: ""
         }.to_json
       )
 
@@ -39,7 +56,7 @@ class ScrapperApi
 
       results = JSON.parse(response.body)['hits']
 
-      break if results.empty?
+      break if results.nil? || results.empty?
 
       results.each do |company|
         break if @companies.size >= @n
@@ -58,6 +75,7 @@ class ScrapperApi
           description: description,
           batch: batch,
           website: website,
+          # object_id: company['objectID'],
           founders: founders.join(', '),
           linkedin_urls: linkedin_urls.join(', ')
         }
@@ -69,6 +87,7 @@ class ScrapperApi
     @companies
   end
 
+  #export data to csv format
   def export_csv
     CSV.generate(headers: true) do |csv|
       csv << %w[name location description batch website founders linkedin_urls]
@@ -76,6 +95,30 @@ class ScrapperApi
       @companies.each do |company|
         csv << company.values
       end
+    end
+  end
+
+  private
+
+  def build_filters
+    @filters = @filters.to_h
+    # map keys with actual parameters passed with api parameters
+    filter_mapping = {
+      "industry" => "industries",
+      "region" => "regions",
+      "tag" => "top_company",
+      "company_size" => "company_size",
+      "is_hiring" => "isHiring",
+      "nonprofit" => "nonprofit",
+      "black_founded" => "highlight_black",
+      "hispanic_latino_founded" => "highlight_latinx",
+      "women_founded" => "highlight_women",
+      "batch" => "batch"
+    }
+
+    @filters.map do |key, value|
+      mapped_key = filter_mapping[key]
+      ["#{mapped_key}:#{value}"]
     end
   end
 end
