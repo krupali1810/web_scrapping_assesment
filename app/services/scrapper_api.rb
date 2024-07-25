@@ -17,14 +17,14 @@ class ScrapperApi
     hits_per_page = 10
 
     # set company size object
-    if @filters[:company_size].include?("-")
-      company_size = @filters[:company_size].split("-")
-      min_company_size = company_size[0].to_i
-      max_company_size = company_size[1].to_i
-    else
-      min_company_size = 1
-      maximum_company_size = @filters[:company_size].to_i
-    end
+    # if @filters[:company_size].include?("-")
+    #   company_size = @filters[:company_size].split("-")
+    #   min_company_size = company_size[0].to_i
+    #   max_company_size = company_size[1].to_i
+    # else
+    #   min_company_size = 1
+    #   maximum_company_size = @filters[:company_size].to_i
+    # end
 
     while @companies.size < @n
       response = HTTParty.post(
