@@ -3,22 +3,43 @@
 This README would normally document whatever steps are necessary to get the
 application up and running.
 
-Things you may want to cover:
+# Usage
+1. Clone the repository
 
-* Ruby version
+```ruby
+gh repo clone krupali1810/web_scrapping_assesment
+run budle install
+```
+2. Scrape data using following steps
 
-* System dependencies
+Start rails server
+```ruby
+rails s
+```
 
-* Configuration
+# Example Input
+```ruby
+{
+  "n": 10,
+  "filters": {
+    "batch": "W21",
+    "industry": "Healthcare",
+    "region": "United States",
+    "tag": "Top Companies",
+    "company_size": "1-10",
+    "is_hiring": true,
+    "nonprofit": false,
+    "black_founded": true,
+    "hispanic_latino_founded": false,
+    "women_founded": true
+  }
+}
+```
+# Postman collection
 
-* Database creation
+Find the postman collection below to run the api with filters
 
-* Database initialization
+```ruby
+https://documenter.getpostman.com/view/31086962/2sA3kXFgSZ
+```
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
